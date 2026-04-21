@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KAVAK · Dashboard CSAT · Rosario CDMX-Norte</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{font-family:'Inter',Arial,sans-serif;background:#F0F4FF;-webkit-font-smoothing:antialiased;padding:20px}
+div,span,p,td,th,button{font-family:'Inter',Arial,sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding-bottom:40px}
+.hdr{background:#2563EB;border-radius:18px;padding:18px 22px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.hdr-k{width:40px;height:40px;background:rgba(255,255,255,0.18);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff}
+.badge{padding:5px 13px;border-radius:20px;font-size:12px;font-weight:700;border:1.5px solid rgba(255,255,255,0.35);color:#fff;background:rgba(255,255,255,0.15)}
+.paste-box{background:#EFF4FF;border-radius:14px;padding:14px 18px;margin-bottom:18px;border:1.5px solid #CDDEFF}
+.paste-box textarea{width:100%;height:80px;font-size:11px;border:1.5px solid #CDDEFF;border-radius:8px;padding:8px;color:#0F1F4B;background:#fff;resize:vertical;font-family:monospace}
+.parse-btn{padding:9px 22px;border-radius:8px;border:none;background:#2563EB;color:#fff;font-size:13px;font-weight:800;cursor:pointer}
+.parse-btn:hover{background:#1A47C0}
+.clear-btn{padding:9px 16px;border-radius:8px;border:1.5px solid #DC2626;background:#fff;color:#DC2626;font-size:12px;font-weight:700;cursor:pointer}
+.clear-btn:hover{background:#FEE2E2}
+.msg{font-size:12px;font-weight:700;padding:6px 12px;border-radius:8px;display:none;margin-top:8px}
+.msg.ok{background:#DCFCE7;color:#166534;display:block}
+.msg.warn{background:#FEF3C7;color:#92400E;display:block}
+.msg.err{background:#FEE2E2;color:#991B1B;display:block}
+.saved-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#166534;background:#DCFCE7;padding:4px 10px;border-radius:8px;margin-top:8px}
+.navrow{display:flex;gap:7px;margin-bottom:18px;flex-wrap:wrap}
+.navbtn{padding:8px 18px;border-radius:22px;font-size:13px;font-weight:700;cursor:pointer;border:1.5px solid #CDDEFF;background:#fff;color:#2040A0;transition:all .15s}
+.navbtn.on{background:#2563EB;color:#fff;border-color:#2563EB}
+.navbtn:hover:not(.on){background:#EFF4FF}
+.view{display:none}.view.on{display:block}
+.banner{background:#2563EB;border-radius:18px;padding:22px;margin-bottom:18px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.ring-wrap{position:relative;width:96px;height:96px;flex-shrink:0}
+.ring-inner{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.stat-l{font-size:10px;font-weight:700;color:rgba(255,255,255,0.55);margin-top:3px;text-transform:uppercase;letter-spacing:.06em}
+.alc-card{border-radius:14px;padding:12px 16px;min-width:120px;border:1.5px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.12)}
+.alc-lbl{font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,0.65);margin-bottom:5px}
+.alc-bar{height:5px;border-radius:3px;background:rgba(255,255,255,0.2);margin-top:7px;overflow:hidden}
+.alc-fill{height:100%;border-radius:3px;background:#fff}
+.vert-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+.vert-card{border-radius:18px;overflow:hidden;border:1.5px solid #CDDEFF;background:#fff}
+.vert-hd{padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+.vert-bd{padding:14px 16px;background:#fff}
+.goal-bar{height:11px;border-radius:6px;overflow:hidden;position:relative;margin:5px 0 12px;background:#E0EBFF}
+.goal-fill{height:100%;border-radius:6px}
+.goal-pin{position:absolute;top:-3px;bottom:-3px;width:3px;border-radius:1px;background:#D97706}
+.pd-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pd-block{border-radius:10px;padding:12px 14px}
+.venta-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.venta-block{border-radius:10px;padding:10px 12px;border:1.5px solid #CDDEFF}
+.rsplit{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+.rsec{border-radius:14px;overflow:hidden;border:1.5px solid #CDDEFF;background:#fff}
+.rsec-hd{padding:12px 14px}
+.ritem{display:flex;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid #CDDEFF;transition:background .12s}
+.ritem:hover{background:#EFF4FF}
+.rbar-wrap{width:56px;height:8px;border-radius:4px;overflow:hidden;background:#E0EBFF}
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+.chart-card{background:#fff;border:1.5px solid #CDDEFF;border-radius:14px;padding:16px}
+.legend{display:flex;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:#2040A0}
+.lsq{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.sec{font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#2040A0;margin-bottom:12px;padding-bottom:7px;border-bottom:2.5px solid #CDDEFF;display:flex;align-items:center;gap:8px}
+.sec-line{flex:1;height:1px;background:#CDDEFF}
+.agt-list{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+.agt-item{border:1.5px solid #CDDEFF;border-radius:14px;padding:12px 14px;cursor:pointer;background:#fff;transition:all .15s}
+.agt-item:hover,.agt-item.open{border-color:#2563EB;background:#EFF4FF}
+.agt-item.open{border-radius:14px 14px 0 0}
+.agt-track{flex:1;height:26px;border-radius:7px;overflow:hidden;position:relative;background:#E0EBFF}
+.agt-fill{height:100%;border-radius:7px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;min-width:6px}
+.agt-pin{position:absolute;top:0;bottom:0;width:2.5px;border-radius:1px;background:#D97706}
+.agt-expand{display:none;border:1.5px solid #2563EB;border-top:none;border-radius:0 0 14px 14px;background:#EFF4FF}
+.agt-expand.open{display:block}
+.cmt-row{padding:10px 14px;border-bottom:1px solid #CDDEFF}
+.cmt-row:last-child{border-bottom:none}
+.tbl-wrap{overflow-x:auto;margin-bottom:18px}
+.tbl{width:100%;border-collapse:collapse;table-layout:fixed}
+.tbl th{font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#2040A0;text-align:left;padding:10px;border-bottom:2px solid #CDDEFF;background:#EFF4FF}
+.tbl td{padding:10px;border-bottom:1px solid #CDDEFF;vertical-align:middle;background:#fff}
+.tbl tr.g-row td{background:#DCFCE7}
+.tbl tr.g-row:hover td{background:#BBF7D0}
+.tbl tr.r-row td{background:#FEE2E2}
+.tbl tr.r-row:hover td{background:#FECACA}
+.tbl tr.norm:hover td{background:#EFF4FF}
+.tbl tr.exp-tr{display:none}
+.tbl tr.exp-tr.open{display:table-row}
+.exp-cell{padding:10px 14px;border-bottom:1px solid #CDDEFF}
+.exp-cell:last-child{border-bottom:none}
+.avt{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0}
+.tag{display:inline-block;padding:3px 9px;border-radius:5px;font-size:12px;font-weight:700}
+.pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700}
+.top3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px}
+.t3card{border-radius:12px;overflow:hidden;border:2px solid;padding:10px 12px}
+.t3-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.t3-medal{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff;flex-shrink:0}
+.t3-avt{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0}
+.t3-stats{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+.t3-pt{display:flex;align-items:flex-start;gap:6px;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.07)}
+.t3-pt:last-child{border-bottom:none}
+.bot3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px}
+.b3card{border-radius:12px;overflow:hidden;border:2px solid #DC2626}
+.b3-hd{padding:10px 12px}
+.b3-bd{padding:10px 12px;background:#fff}
+.b3-imp{display:flex;align-items:flex-start;gap:7px;padding:5px 0;border-bottom:1px solid #CDDEFF}
+.b3-imp:last-child{border-bottom:none}
+.imp-panel{border-radius:18px;overflow:hidden;border:2px solid #2563EB;margin-bottom:18px}
+.imp-hdr{padding:14px 18px;background:#2563EB;display:flex;align-items:center;justify-content:space-between}
+.imp-cat{border-bottom:1px solid #CDDEFF}
+.imp-cat:last-child{border-bottom:none}
+.imp-cat-hd{padding:13px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;background:#fff;transition:background .15s}
+.imp-cat-hd:hover,.imp-cat-hd.open{background:#EFF4FF}
+.imp-items{display:none;padding:0 16px 12px;background:#EFF4FF}
+.imp-items.open{display:block}
+.imp-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #CDDEFF}
+.imp-item:last-child{border-bottom:none}
+.imp-num{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0}
+.cmt-card{background:#fff;border-radius:14px;border:1.5px solid #CDDEFF;padding:14px 16px;margin-bottom:10px;border-left-width:4px}
+.cmt-card.det{border-left-color:#DC2626}
+.cmt-card.pro{border-left-color:#16A34A}
+@media(max-width:700px){.vert-row,.rsplit,.chart-row,.top3,.bot3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hdr">
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="hdr-k">K</div>
+    <div>
+      <div style="font-size:17px;font-weight:900;color:#fff;letter-spacing:1px">KAVAK <span style="color:rgba(255,255,255,0.5);font-weight:600;font-size:14px;letter-spacing:0">· Dashboard CSAT</span></div>
+      <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.6);margin-top:2px" id="ts">Rosario CDMX-Norte · Meta: 80%</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <span id="ph" class="badge">Hub —%</span>
+    <span id="pd" class="badge">Del —%</span>
+  </div>
+</div>
+
+<div class="paste-box">
+  <div style="font-size:13px;font-weight:800;color:#2040A0;margin-bottom:4px">Actualizar datos — pega CSV con encabezados</div>
+  <div style="font-size:11px;font-weight:600;color:#5A6FA8;margin-bottom:7px">Columnas: <code>answer_date · answer_id · type_csat · csat_score · csat_score_category · csat · reason · subreason · comments · kavak_attention</code></div>
+  <textarea id="csv-in" placeholder="Pega aquí tu CSV incluyendo encabezados..."></textarea>
+  <div style="display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap">
+    <button class="parse-btn" onclick="parseCSV()">Procesar y actualizar ↗</button>
+    <button class="clear-btn" onclick="clearData()">Borrar datos guardados</button>
+    <div id="msg" class="msg"></div>
+  </div>
+  <div id="saved-info" style="display:none" class="saved-badge">💾 Datos guardados — se cargan automáticamente al reabrir</div>
+</div>
+
+<div class="navrow">
+  <button class="navbtn on" onclick="nav('general',this)">Vista general</button>
+  <button class="navbtn" onclick="nav('hub',this)">Hub Visit</button>
+  <button class="navbtn" onclick="nav('del',this)">Deliveries</button>
+  <button class="navbtn" onclick="nav('agents',this)">Agentes</button>
+  <button class="navbtn" onclick="nav('comments',this)">Comentarios</button>
+</div>
+
+<div id="v-general" class="view on"></div>
+<div id="v-hub" class="view"></div>
+<div id="v-del" class="view"></div>
+<div id="v-agents" class="view"></div>
+<div id="v-comments" class="view"></div>
+
+</div>
+
+<script>
+var CHARTS={},GOAL=80,CURTAB='general',DATA=[];
+var ACOLS=['#2563EB','#16A34A','#7C3AED','#DC2626','#D97706','#0891B2','#DB2777','#059669','#1A47C0'];
+var MC=[{bg:'#FEF3C7',bd:'#F59E0B',tx:'#92400E',md:'#F59E0B'},{bg:'#F1F5F9',bd:'#94A3B8',tx:'#334155',md:'#94A3B8'},{bg:'#FEF0EA',bd:'#C2603E',tx:'#7C2D12',md:'#C2603E'}];
+var LS_KEY='kavak_csat_data_v1';
+
+function saveToStorage(csvRaw,parsedData){try{localStorage.setItem(LS_KEY,JSON.stringify({csv:csvRaw,saved:new Date().toISOString(),count:parsedData.length}));document.getElementById('saved-info').style.display='inline-flex';return true;}catch(e){return false;}}
+function loadFromStorage(){try{var r=localStorage.getItem(LS_KEY);return r?JSON.parse(r):null;}catch(e){return null;}}
+window.clearData=function(){try{localStorage.removeItem(LS_KEY);}catch(e){}DATA=[];document.getElementById('saved-info').style.display='none';document.getElementById('ph').textContent='Hub —%';document.getElementById('pd').textContent='Del —%';document.getElementById('ts').textContent='Rosario CDMX-Norte · Meta: 80%';var m=document.getElementById('msg');m.className='msg warn';m.textContent='Datos borrados. Pega tu CSV para volver a cargar.';m.style.display='block';setTimeout(function(){redraw();},50);};
+
+function ini(n){return(n||'').split(' ').slice(0,2).map(function(w){return w[0]||''}).join('').toUpperCase()||'?'}
+function agN(e){if(!e||e==='?')return'Sin asignar';return e.replace(/@kavak\.com$/i,'').split('.').map(function(w){return w.charAt(0).toUpperCase()+w.slice(1)}).join(' ')}
+function cc(v){return v>=GOAL?'#16A34A':v>=50?'#D97706':'#DC2626'}
+function cbg(v){return v>=GOAL?'#DCFCE7':v>=50?'#FEF3C7':'#FEE2E2'}
+function ctx(v){return v>=GOAL?'#166534':v>=50?'#92400E':'#991B1B'}
+function FT(t,sz,fw,col){return'<span style="font-size:'+sz+'px;font-weight:'+fw+';color:'+col+'">'+t+'</span>'}
+function LBL(t,col){return'<div style="font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:'+col+';margin-bottom:5px">'+t+'</div>'}
+function SEC(t,col){return'<div class="sec"><span style="font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:'+(col||'#2040A0')+'">'+t+'</span><span class="sec-line"></span></div>'}
+function calcSt(rows){var n=rows.length;if(!n)return{n:0,p:0,d:0,csat:0,avg:0};var p=rows.filter(function(r){return r.cat==='Promoter'}).length,d=n-p;return{n:n,p:p,d:d,csat:Math.round(p/n*100),avg:parseFloat((rows.reduce(function(a,b){return a+b.score},0)/n).toFixed(1))};}
+function buildAgents(rows){var m={},ci=0;rows.forEach(function(r){var k=r.agent||'?';if(!m[k]){m[k]={e:k,name:agN(k),n:0,p:0,d:0,cmts:[],types:[],reasons:{},col:ACOLS[ci%ACOLS.length]};ci++}var a=m[k];a.n++;if(a.types.indexOf(r.type)<0)a.types.push(r.type);if(r.cat==='Promoter'){a.p++;if(r.reason)a.reasons[r.reason]=(a.reasons[r.reason]||0)+1;}else{a.d++;if(r.comment&&r.comment.length>3)a.cmts.push({txt:r.comment,score:r.score,date:r.date,type:r.type,reason:r.reason||''});if(r.reason)a.reasons[r.reason]=(a.reasons[r.reason]||0)-1;}});return Object.values(m).filter(function(a){return a.e!=='?'&&a.n>=2}).map(function(a){return Object.assign({},a,{csat:Math.round(a.p/a.n*100),typStr:a.types.join(' + ')})});}
+function buildReasons(rows){var m={};rows.forEach(function(r){var k=r.reason||'Sin razón';if(!m[k])m[k]={r:k,n:0,d:0};m[k].n++;if(r.cat==='Detractor')m[k].d++;});return Object.values(m).filter(function(x){return x.d>0}).sort(function(a,b){return b.d-a.d});}
+function dC(id){if(CHARTS[id]){try{CHARTS[id].destroy();}catch(e){}delete CHARTS[id];}}
+
+function doParse(rawInput){
+  var raw=rawInput;
+  var joined='',inQ=false;
+  for(var ci=0;ci<raw.length;ci++){var ch=raw[ci];if(ch==='"')inQ=!inQ;if(ch==='\n'&&inQ)joined+=' ';else joined+=ch;}
+  raw=joined.replace(/\r\n/g,'\n').replace(/\r/g,'\n').replace(/^\uFEFF/,'');
+  var lines=raw.split('\n');
+  var L0=lines[0]||'';
+  var SEP=(L0.match(/\t/g)||[]).length>=(L0.match(/,/g)||[]).length?'\t':',';
+  function splitRow(line){
+    if(SEP==='\t')return line.split('\t').map(function(c){return c.replace(/^"|"$/g,'').trim();});
+    var out=[],inQ=false,cur='';
+    for(var i=0;i<line.length;i++){if(line[i]==='"'){inQ=!inQ;}else if(line[i]===','&&!inQ){out.push(cur.replace(/^"|"$/g,'').trim());cur='';}else cur+=line[i];}
+    out.push(cur.replace(/^"|"$/g,'').trim());return out;
+  }
+  var hdrs=splitRow(lines[0]).map(function(h){return h.toLowerCase().trim().replace(/\s+/g,'_');});
+  function idx(names){for(var i=0;i<names.length;i++){for(var h=0;h<hdrs.length;h++){if(hdrs[h]===names[i].toLowerCase())return h;}}for(var i=0;i<names.length;i++){for(var h=0;h<hdrs.length;h++){if(hdrs[h].indexOf(names[i].toLowerCase())===0)return h;}}return -1;}
+  var I={id:idx(['answer_id']),date:idx(['answer_date']),type:idx(['type_csat']),score:idx(['csat_score']),catTxt:idx(['csat_score_category']),csat01:idx(['csat']),agent:idx(['kavak_attention']),comment:idx(['comments']),reason:idx(['reason']),sub:idx(['subreason'])};
+  if(I.type<0||I.score<0)return null;
+  function get(cols,i){return i>=0&&i<cols.length?cols[i].trim():'';}
+  var seen={},parsed=[],dupes=0;
+  for(var li=1;li<lines.length;li++){
+    var line=lines[li];
+    if(!line||!line.replace(/\t/g,'').trim())continue;
+    var cols=splitRow(line);
+    if(cols.filter(function(c){return c.trim().length>0}).length<3)continue;
+    var aid=get(cols,I.id);
+    if(aid){if(seen[aid]){dupes++;continue;}seen[aid]=true;}
+    var rawType=get(cols,I.type).toUpperCase();
+    var type=rawType.indexOf('HUB')>=0?'HUB VISIT':rawType.indexOf('DELI')>=0?'DELIVERIES':'';
+    if(!type)continue;
+    var score=parseInt(get(cols,I.score),10);
+    if(isNaN(score)||score<1||score>5)continue;
+    var cat='',catRaw=get(cols,I.catTxt).toLowerCase();
+    if(catRaw.indexOf('promo')>=0)cat='Promoter';
+    else if(catRaw.indexOf('detract')>=0)cat='Detractor';
+    if(!cat){var c01=get(cols,I.csat01).trim();if(c01==='1')cat='Promoter';else if(c01==='0')cat='Detractor';}
+    if(!cat)cat=score>=4?'Promoter':'Detractor';
+    parsed.push({date:get(cols,I.date).substring(0,10)||'Sin fecha',type:type,score:score,cat:cat,agent:get(cols,I.agent)||'',comment:get(cols,I.comment)||'',reason:get(cols,I.reason)||get(cols,I.sub)||''});
+  }
+  return{parsed:parsed,dupes:dupes};
+}
+
+window.parseCSV=function(){
+  var rawInput=document.getElementById('csv-in').value;
+  var msg=document.getElementById('msg');
+  msg.className='msg';msg.style.display='none';
+  if(!rawInput||!rawInput.trim()){msg.className='msg err';msg.textContent='⚠ Pega tu data primero.';msg.style.display='block';return;}
+  var result=doParse(rawInput);
+  if(!result){msg.className='msg err';msg.innerHTML='⚠ No encontré columnas <b>type_csat</b> o <b>csat_score</b>.';msg.style.display='block';return;}
+  if(!result.parsed.length){msg.className='msg err';msg.textContent='⚠ Sin filas válidas.';msg.style.display='block';return;}
+  DATA=result.parsed;
+  saveToStorage(rawInput,DATA);
+  document.getElementById('csv-in').value='';
+  var dates=DATA.map(function(r){return r.date}).filter(function(d){return d!=='Sin fecha'}).sort();
+  if(dates.length)document.getElementById('ts').textContent='Rosario CDMX-Norte · '+dates[0].slice(5)+' → '+dates[dates.length-1].slice(5)+' · Meta: 80%';
+  var p=DATA.filter(function(r){return r.cat==='Promoter'}).length;
+  msg.className='msg ok';
+  msg.textContent='✓ '+DATA.length+' encuestas · '+p+' promotores · '+(DATA.length-p)+' detractores'+(result.dupes?' · '+result.dupes+' duplicadas omitidas':'')+' · 💾 Guardado';
+  msg.style.display='block';
+  updatePills();
+  setTimeout(function(){redraw();},50);
+};
+
+function trendChart(id,rows){dC(id);var el=document.getElementById(id);if(!el)return;var days={};rows.forEach(function(r){if(!days[r.date])days[r.date]={t:0,p:0};days[r.date].t++;if(r.cat==='Promoter')days[r.date].p++;});var lb=Object.keys(days).sort(),vl=lb.map(function(l){return Math.round(days[l].p/days[l].t*100)});CHARTS[id]=new Chart(el,{type:'line',data:{labels:lb.map(function(l){return l.slice(5)}),datasets:[{data:vl,borderColor:'#2563EB',backgroundColor:'rgba(37,99,235,0.07)',fill:true,tension:0.35,pointRadius:4,pointBackgroundColor:vl.map(function(v){return v>=GOAL?'#16A34A':'#DC2626'}),pointBorderColor:'#fff',pointBorderWidth:1.5,borderWidth:2.5},{data:lb.map(function(){return 80}),borderColor:'#D97706',borderDash:[5,4],pointRadius:0,fill:false,borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:11,weight:'600'},color:'#5A6FA8',autoSkip:true,maxRotation:0}},y:{min:0,max:100,grid:{color:'rgba(37,99,235,0.07)'},ticks:{callback:function(v){return v+'%'},font:{size:11,weight:'600'},color:'#5A6FA8'}}}}});}
+function scoreChart(id,rows){dC(id);var el=document.getElementById(id);if(!el)return;var c=[1,2,3,4,5].map(function(s){return rows.filter(function(r){return r.score===s}).length});CHARTS[id]=new Chart(el,{type:'bar',data:{labels:['1','2','3','4','5'],datasets:[{data:c,backgroundColor:['#DC2626','#DC2626','#D97706','#16A34A','#16A34A'],borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:12,weight:'700'},color:'#5A6FA8'}},y:{grid:{color:'rgba(37,99,235,0.07)'},ticks:{stepSize:1,font:{size:11,weight:'600'},color:'#5A6FA8'},beginAtZero:true}}}});}
+function donutChart(id,p,d){dC(id);var el=document.getElementById(id);if(!el)return;CHARTS[id]=new Chart(el,{type:'doughnut',data:{labels:['Promotores','Detractores'],datasets:[{data:[p,d],backgroundColor:['#16A34A','#DC2626'],borderWidth:0,hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{display:false}}}});}
+
+function banner(rows){var all=calcSt(rows),hub=calcSt(rows.filter(function(r){return r.type==='HUB VISIT'})),del=calcSt(rows.filter(function(r){return r.type==='DELIVERIES'}));var r=all.avg/5,ci=2*Math.PI*38,da=ci*r;var aH=hub.n?Math.round(hub.p/hub.n*100):0,aD=del.n?Math.round(del.p/del.n*100):0;var h='<div class="banner"><div class="ring-wrap"><svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="38" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="9"/><circle cx="48" cy="48" r="38" fill="none" stroke="#fff" stroke-width="9" stroke-dasharray="'+da.toFixed(1)+' '+ci.toFixed(1)+'" stroke-linecap="round" transform="rotate(-90 48 48)"/></svg><div class="ring-inner">'+FT(all.avg,'22','900','#fff')+'<div style="font-size:9px;font-weight:700;color:rgba(255,255,255,0.5)">/ 5.0</div></div></div><div><div style="font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:8px">Score general del hub</div><div style="display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end"><div>'+FT(all.csat+'%','26','900','#fff')+'<div class="stat-l">CSAT Global</div></div><div style="width:1px;background:rgba(255,255,255,0.2);height:36px"></div><div>'+FT(all.p,'24','900','#A7F3D0')+'<div class="stat-l">Promotores</div></div><div>'+FT(all.d,'24','900','#FCA5A5')+'<div class="stat-l">Detractores</div></div><div>'+FT(all.n,'24','900','rgba(255,255,255,0.9)')+'<div class="stat-l">Encuestas</div></div></div></div><div style="display:flex;gap:10px;flex-wrap:wrap;margin-left:auto">';[['Hub Visit',aH,hub],['Deliveries',aD,del]].forEach(function(x){h+='<div class="alc-card"><div class="alc-lbl">'+x[0]+' · alcance</div>'+FT(x[1]+'%','28','900','#fff')+'<div style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.5);margin-top:2px">'+x[2].p+' prom. de '+x[2].n+'</div><div class="alc-bar"><div class="alc-fill" style="width:'+Math.min(x[1],100)+'%"></div></div></div>';});return h+'</div></div>';}
+function vertCard(rows,label,ac,acLt,acDk){var s=calcSt(rows),good=s.csat>=GOAL,pPct=s.n?Math.round(s.p/s.n*100):0,dPct=s.n?Math.round(s.d/s.n*100):0;return'<div class="vert-card"><div class="vert-hd" style="background:'+acLt+'"><div>'+FT(label,'16','900',acDk)+'<div style="font-size:12px;font-weight:700;color:'+ac+';margin-top:3px">'+s.n+' encuestas · promedio '+s.avg+'/5.0</div></div><div style="text-align:right">'+FT(s.csat+'%','32','900',cc(s.csat))+'<div style="font-size:12px;font-weight:800;color:'+cc(s.csat)+';margin-top:2px">'+(good?'✓ Meta alcanzada':'✗ Bajo meta')+'</div></div></div><div class="vert-bd">'+LBL('Progreso hacia meta 80%','#5A6FA8')+'<div class="goal-bar"><div class="goal-fill" style="width:'+Math.min(s.csat,100)+'%;background:'+cc(s.csat)+'"></div><div class="goal-pin" style="left:80%"></div></div><div class="pd-row"><div class="pd-block" style="background:#DCFCE7">'+LBL('Promotores','#16A34A')+FT(s.p,'30','900','#16A34A')+'<div style="font-size:12px;font-weight:700;color:#166534;margin-top:4px">'+pPct+'% del total</div></div><div class="pd-block" style="background:#FEE2E2">'+LBL('Detractores','#DC2626')+FT(s.d,'30','900','#DC2626')+'<div style="font-size:12px;font-weight:700;color:#991B1B;margin-top:4px">'+dPct+'% del total</div></div></div><div class="venta-row"><div class="venta-block" style="background:'+acLt+';border-color:'+ac+'55">'+LBL('Alcance de venta',acDk)+FT(pPct+'%','22','900',cc(pPct))+'<div style="font-size:11px;font-weight:700;color:#5A6FA8;margin-top:2px">'+s.p+' de '+s.n+' convertidos</div></div><div class="venta-block" style="background:#EFF4FF">'+LBL('Score promedio','#5A6FA8')+FT(s.avg,'22','900','#2563EB')+'<div style="font-size:11px;font-weight:700;color:#5A6FA8;margin-top:2px">de 5.0 posible</div></div></div></div></div>';}
+function reasonsSplit(hub,del){var rH=buildReasons(hub),rD=buildReasons(del),mH=rH.length?rH[0].d:1,mD=rD.length?rD[0].d:1;function rR(list,max,ac,acLt,acDk){if(!list.length)return'<div style="padding:14px;font-size:13px;color:#5A6FA8">Sin detractores</div>';return list.map(function(r,i){return'<div class="ritem"><div style="font-size:13px;font-weight:800;color:#5A6FA8;width:20px;flex-shrink:0">'+(i+1)+'</div><div style="font-size:13px;font-weight:600;color:#0F1F4B;flex:1">'+r.r+'</div><div style="display:flex;align-items:center;gap:8px;flex-shrink:0"><div class="rbar-wrap"><div style="height:100%;width:'+Math.round(r.d/max*80)+'%;background:'+ac+';border-radius:4px"></div></div><span class="pill" style="background:'+acLt+';color:'+acDk+';font-size:12px;font-weight:800">'+r.d+' det.</span></div></div>';}).join('');}return'<div class="rsplit"><div class="rsec"><div class="rsec-hd" style="background:#EBF2FF">'+FT('Hub Visit · Razones de detracción','12','800','#1A47C0')+'</div>'+rR(rH,mH,'#2563EB','#EBF2FF','#1A47C0')+'</div><div class="rsec"><div class="rsec-hd" style="background:#EDE9FE">'+FT('Deliveries · Razones de detracción','12','800','#5B21B6')+'</div>'+rR(rD,mD,'#7C3AED','#EDE9FE','#5B21B6')+'</div></div>';}
+function agtTable(ags,totDet){var byDet=ags.slice().sort(function(a,b){return b.d-a.d});var byCsat=ags.slice().sort(function(a,b){return b.csat-a.csat});var top3=byCsat.slice(0,3).map(function(a){return a.e});var bot3=byCsat.slice(-3).map(function(a){return a.e});var h='<div class="tbl-wrap"><table class="tbl"><thead><tr><th style="width:34%">Agente</th><th style="width:10%">Total</th><th style="width:11%">Prom.</th><th style="width:11%">Det.</th><th style="width:12%">CSAT</th><th style="width:22%">Impacto hub</th></tr></thead><tbody>';byDet.forEach(function(a,i){var impact=totDet?Math.round(a.d/totDet*100):0,hasCmts=a.cmts.length>0;var isTop=top3.indexOf(a.e)>=0&&bot3.indexOf(a.e)<0;var isBot=!isTop&&bot3.indexOf(a.e)>=0;var rowCls=isTop?'g-row':isBot?'r-row':'norm';var nameClr=isTop?'#166534':isBot?'#991B1B':'#0F1F4B';var badge=isTop?'<span style="background:#16A34A;color:#fff;font-size:9px;font-weight:900;padding:1px 6px;border-radius:3px;margin-left:5px">TOP</span>':isBot?'<span style="background:#DC2626;color:#fff;font-size:9px;font-weight:900;padding:1px 6px;border-radius:3px;margin-left:5px">MEJ</span>':'';h+='<tr class="'+rowCls+'"'+(hasCmts?' style="cursor:pointer" onclick="togTbl(\'tx'+i+'\',\'tc'+i+'\')"':'')+'><td><div style="display:flex;align-items:center;gap:9px"><div class="avt" style="background:'+a.col+'20;color:'+a.col+';width:34px;height:34px;font-size:12px">'+ini(a.name)+'</div><div><div style="display:flex;align-items:center">'+FT(a.name,'13','800',nameClr)+badge+'</div><div style="font-size:11px;font-weight:600;color:#5A6FA8">'+a.typStr+'</div></div>'+(hasCmts?'<span id="tc'+i+'" style="margin-left:auto;font-size:13px;font-weight:700;color:#5A6FA8">▾</span>':'')+'</div></td><td>'+FT(a.n,'15','900',nameClr)+'</td><td><span class="tag" style="background:#DCFCE7;color:#166534">'+a.p+'</span></td><td><span class="tag" style="background:#FEE2E2;color:#991B1B">'+a.d+'</span></td><td><span class="pill" style="background:'+cbg(a.csat)+';color:'+ctx(a.csat)+'">'+a.csat+'%</span></td><td>'+(impact>0?'<div style="display:flex;align-items:center;gap:7px"><div style="height:10px;width:'+Math.min(impact*1.8,100)+'px;background:#DC2626;border-radius:4px"></div>'+FT(impact+'%','13','800','#DC2626')+'</div>':'—')+'</td></tr>';if(hasCmts){var expBg=isTop?'#DCFCE7':isBot?'#FEE2E2':'#EFF4FF';h+='<tr class="exp-tr" id="tx'+i+'" style="background:'+expBg+'"><td colspan="6" style="padding:0">';a.cmts.forEach(function(c){h+='<div class="exp-cell" style="background:'+expBg+'"><div style="display:flex;gap:6px;align-items:center;margin-bottom:5px;flex-wrap:wrap"><span class="pill" style="background:#FEE2E2;color:#991B1B;font-size:11px">Score '+c.score+'</span><span style="font-size:11px;font-weight:600;color:#5A6FA8">'+c.date+' · '+c.type+'</span></div><div style="font-size:13px;font-weight:500;color:#0F1F4B;line-height:1.6;font-style:italic">"'+c.txt+'"</div><div style="font-size:11px;font-weight:600;color:#5A6FA8;margin-top:3px">'+c.reason+'</div></div>';});h+='</td></tr>';}});h+='</tbody></table><div style="display:flex;gap:14px;margin-top:8px;flex-wrap:wrap"><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#166534"><span style="width:12px;height:12px;background:#DCFCE7;border:1.5px solid #16A34A;border-radius:2px;display:inline-block"></span>Top 3 mejor CSAT</span><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#991B1B"><span style="width:12px;height:12px;background:#FEE2E2;border:1.5px solid #DC2626;border-radius:2px;display:inline-block"></span>Top 3 peor CSAT</span></div></div>';return h;}
+window.togTbl=function(id,chvId){var el=document.getElementById(id);if(!el)return;var open=el.classList.contains('open');el.classList.toggle('open',!open);el.style.display=open?'none':'table-row';var chv=document.getElementById(chvId);if(chv)chv.textContent=open?'▾':'▴';};
+function agtVisual(ags,totDet){var sorted=ags.slice().sort(function(a,b){return a.csat-b.csat});var h='<div class="agt-list">';sorted.forEach(function(a,i){var fc=cc(a.csat),impact=totDet?Math.round(a.d/totDet*100):0,hasCmts=a.cmts.length>0;h+='<div><div class="agt-item" id="ar'+i+'" onclick="togAgt('+i+')">';h+='<div style="display:flex;align-items:center;gap:10px"><div style="width:140px;flex-shrink:0;display:flex;align-items:center;gap:8px"><div class="avt" style="background:'+a.col+'22;color:'+a.col+';width:32px;height:32px;font-size:11px">'+ini(a.name)+'</div><div>'+FT(a.name.split(' ').slice(0,2).join(' '),'13','800','#0F1F4B')+'<div style="font-size:11px;font-weight:600;color:#5A6FA8">'+a.n+' enc · '+a.typStr+'</div></div></div><div class="agt-track"><div class="agt-fill" style="width:'+a.csat+'%;background:'+fc+'"><span style="font-size:12px;font-weight:800;color:#fff">'+(a.csat>22?a.csat+'%':'')+'</span></div><div class="agt-pin" style="left:80%"></div></div>'+FT(a.csat+'%','18','900',fc)+'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;width:56px;flex-shrink:0"><span style="background:#FEE2E2;color:#991B1B;font-size:11px;font-weight:800;padding:2px 7px;border-radius:4px">'+a.d+' det.</span>'+(impact>0?FT('−'+impact+'% hub','10','800','#DC2626'):'')+'</div>'+(hasCmts?'<div id="ac'+i+'" style="font-size:13px;font-weight:700;color:#5A6FA8;width:16px;text-align:center;transition:transform .2s;flex-shrink:0">▾</div>':'<div style="width:16px"></div>')+'</div></div>';if(hasCmts){h+='<div class="agt-expand" id="ae'+i+'"><div style="padding:8px 14px 4px;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#1A47C0">Comentarios — '+a.name.split(' ')[0]+'</div>';a.cmts.forEach(function(c){h+='<div class="cmt-row"><div style="display:flex;gap:6px;align-items:center;margin-bottom:6px;flex-wrap:wrap"><span class="pill" style="background:#FEE2E2;color:#991B1B;font-size:11px">Score '+c.score+'</span><span style="font-size:11px;font-weight:600;color:#5A6FA8">'+c.date+' · '+c.type+'</span></div><div style="font-size:13px;font-weight:500;color:#0F1F4B;line-height:1.6;font-style:italic">"'+c.txt+'"</div></div>';});h+='</div>';}h+='</div>';});return h+'</div>';}
+window.togAgt=function(i){var item=document.getElementById('ar'+i),exp=document.getElementById('ae'+i),chv=document.getElementById('ac'+i);if(!exp)return;var open=exp.classList.contains('open');exp.classList.toggle('open',!open);item.classList.toggle('open',!open);if(chv)chv.style.transform=open?'rotate(0)':'rotate(180deg)';};
+function getStr(a){var s=[];if(a.csat>=80)s.push('CSAT por encima de la meta del 80%');if(a.p>a.d*2)s.push('Alta proporción de promotores vs detractores');var top=Object.entries(a.reasons).filter(function(x){return x[1]>0}).sort(function(x,y){return y[1]-x[1]}).slice(0,2).map(function(x){return x[0]});top.forEach(function(r){s.push('Destaca en: '+r);});if(a.d===0)s.push('Cero detractores en el período');if(!s.length){s.push('Completa sus encuestas asignadas');s.push('Mantiene comunicación con clientes');}return s.slice(0,4);}
+function getImp(a){var s=[];var dr=[...new Set(a.cmts.map(function(c){return c.reason}).filter(Boolean))];dr.slice(0,2).forEach(function(r){s.push('Atender causa raíz: "'+r+'"');});if(a.d>2)s.push('Reducir detractores ('+a.d+') al menos 50%');if(a.csat<50)s.push('Plan de mejora urgente — CSAT crítico');else if(a.csat<80)s.push('Alcanzar meta 80% (actual: '+a.csat+'%)');if(a.cmts.some(function(c){return/(descort|grosero|pésim)/i.test(c.txt);}))s.push('Reforzar protocolo de trato amable');if(a.cmts.some(function(c){return/(document|placa|llave)/i.test(c.txt);}))s.push('Checklist pre-entrega: documentación completa');if(a.cmts.some(function(c){return/(lento|tardó|tiempo)/i.test(c.txt);}))s.push('Optimizar tiempos de proceso');if(a.cmts.some(function(c){return/(condicion|sucio|rayones)/i.test(c.txt);}))s.push('Revisión rigurosa del vehículo antes de entrega');if(!s.length){s.push('Mantener constancia en calidad');s.push('Documentar buenas prácticas');}return s.slice(0,4);}
+function top3Cards(ags){var sorted=ags.slice().sort(function(a,b){return b.csat-a.csat||b.p-a.p}).slice(0,3);if(!sorted.length)return'';var h=SEC('Top 3 — Mejores colaboradores','#16A34A')+'<div class="top3">';sorted.forEach(function(a,i){var mc=MC[i],str=getStr(a);h+='<div class="t3card" style="border-color:'+mc.bd+';background:'+mc.bg+'"><div class="t3-top"><div class="t3-medal" style="background:'+mc.md+'">'+(i+1)+'</div><div class="t3-avt" style="background:'+mc.md+'22;color:'+mc.md+'">'+ini(a.name)+'</div><div style="flex:1"><div style="font-size:13px;font-weight:900;color:'+mc.tx+';line-height:1.2">'+a.name+'</div><div style="font-size:10px;font-weight:700;color:'+mc.md+'">'+['#1 · Mejor del hub','#2 · Segundo lugar','#3 · Tercer lugar'][i]+'</div></div><div style="text-align:right">'+FT(a.csat+'%','30','900',mc.md)+'</div></div><div class="t3-stats"><span class="tag" style="background:#DCFCE7;color:#166534;font-size:11px">'+a.p+' prom.</span><span class="tag" style="background:#FEE2E2;color:#991B1B;font-size:11px">'+a.d+' det.</span><span class="tag" style="background:'+mc.bd+'33;color:'+mc.tx+';font-size:11px">'+a.n+' enc.</span></div><div style="font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:'+mc.tx+';margin-bottom:6px">Puntos destacados</div>';str.forEach(function(s){h+='<div class="t3-pt"><div style="width:6px;height:6px;border-radius:50%;background:'+mc.md+';flex-shrink:0;margin-top:5px"></div><div style="font-size:11px;font-weight:600;color:'+mc.tx+';line-height:1.45">'+s+'</div></div>';});h+='</div>';});return h+'</div>';}
+function bot3Cards(ags){var sorted=ags.slice().sort(function(a,b){return a.csat-b.csat||b.d-a.d}).slice(0,3);if(!sorted.length)return'';var RL=['Riesgo crítico','Riesgo alto','Riesgo medio'];var RC=['#DC2626','#D97706','#D97706'],RB=['#FEE2E2','#FEF3C7','#FEF3C7'];var h=SEC('Top 3 — Colaboradores que necesitan mejora','#DC2626')+'<div class="bot3">';sorted.forEach(function(a,i){var rc=RC[Math.min(i,2)],rb=RB[Math.min(i,2)],imps=getImp(a);h+='<div class="b3card" style="border-color:'+rc+'"><div class="b3-hd" style="background:'+rb+'"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px"><div style="display:flex;align-items:center;gap:7px"><div style="width:24px;height:24px;border-radius:50%;background:'+rc+';display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff">'+(i+1)+'</div><div>'+FT(a.name,'13','900','#0F1F4B')+'<div style="font-size:10px;font-weight:700;color:'+rc+'">'+RL[i]+'</div></div></div><div style="text-align:right">'+FT(a.csat+'%','28','900',rc)+'</div></div><div style="display:flex;gap:5px;flex-wrap:wrap"><span class="tag" style="background:#DCFCE7;color:#166534;font-size:11px">'+a.p+' prom.</span><span class="tag" style="background:#FEE2E2;color:#991B1B;font-size:11px">'+a.d+' det.</span><span class="tag" style="background:'+rc+'22;color:'+rc+';font-size:11px">'+a.n+' enc.</span></div></div><div class="b3-bd"><div style="font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:'+rc+';margin-bottom:7px">Mejoras a implementar</div>';imps.forEach(function(s,j){h+='<div class="b3-imp"><div style="width:20px;height:20px;border-radius:5px;background:'+rb+';border:1.5px solid '+rc+'44;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:'+rc+';flex-shrink:0">'+(j+1)+'</div><div style="font-size:11px;font-weight:600;color:#0F1F4B;line-height:1.45">'+s+'</div></div>';});h+='</div></div>';});return h+'</div>';}
+function impPanel(){var cats=[{ic:'A',col:'#2563EB',bg:'#EBF2FF',tit:'Atención al cliente',desc:'Principal causa de detracción en Hub Visit.',items:['Capacitación mensual en protocolo de bienvenida','Ningún cliente debe esperar más de 3 minutos sin ser atendido','Entrenar en lenguaje empático y manejo de objeciones','Guía de siguientes pasos para orientar al cliente','Sistema de asignación de asesores']},{ic:'V',col:'#7C3AED',bg:'#EDE9FE',tit:'Condición del vehículo',desc:'Segundo problema más frecuente en Deliveries.',items:['Checklist de 20 puntos pre-entrega','Limpieza profunda + máquinas de ozono','Verificar gasolina mínima antes de cada entrega','Revisar llantas, frenos y fluidos','Auditoría fotográfica al momento de la entrega']},{ic:'D',col:'#D97706',bg:'#FEF3C7',tit:'Documentación y proceso',desc:'Retrasa entregas y genera frustración.',items:['Checklist: placas, tenencia, tarjeta de circulación, llaves','Responsable de documentación 48 horas antes','Informar precio real de trámites desde el inicio','Sistema de alerta si falta algún documento','Resumen escrito con trámites pendientes']},{ic:'P',col:'#16A34A',bg:'#DCFCE7',tit:'Velocidad del proceso',desc:'Los tiempos largos son queja recurrente.',items:['Tiempo máximo de entrega: 90 minutos','Preparar unidad con 2 horas de anticipación','Coordinador de entregas exclusivo por día','Comunicar tiempo estimado al inicio','Revisar cuellos de botella semanalmente']},{ic:'K',col:'#0891B2',bg:'#E0F7FA',tit:'Conocimiento del producto',desc:'Asesores que no resuelven dudas generan desconfianza.',items:['Capacitación quincenal sobre inventario y trámites','Base de conocimiento en tablets en piso','Role-play semanal','Certificación interna antes de atender','Experto del día como respaldo']},{ic:'S',col:'#DB2777',bg:'#FCE7F3',tit:'Seguimiento post-venta',desc:'Problemas no resueltos generan detractores.',items:['Llamada 48 horas después de cada entrega','Proceso claro para reportar fallas','Respuesta a reclamos: 24 horas hábiles','Expediente hasta resolver cada caso','Dashboard semanal de reclamos abiertos']}];var h='<div class="imp-panel"><div class="imp-hdr">'+FT('Plan de mejora — Acciones recomendadas','15','900','#fff')+'<span style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.7)">Clic para expandir</span></div>';cats.forEach(function(cat,ci){h+='<div class="imp-cat"><div class="imp-cat-hd" id="ichd'+ci+'" onclick="togImp('+ci+')">';h+='<div style="width:32px;height:32px;border-radius:8px;background:'+cat.bg+';border:1.5px solid '+cat.col+'44;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:'+cat.col+';flex-shrink:0">'+cat.ic+'</div>';h+='<div style="flex:1">'+FT(cat.tit,'14','800','#0F1F4B')+'<div style="font-size:12px;font-weight:600;color:#5A6FA8">'+cat.desc+'</div></div>';h+='<div style="display:flex;align-items:center;gap:8px"><span style="background:'+cat.bg+';color:'+cat.col+';font-size:11px;font-weight:800;padding:3px 10px;border-radius:10px">5 acciones</span><span id="ichv'+ci+'" style="font-size:14px;font-weight:700;color:#5A6FA8;transition:transform .2s">▾</span></div></div>';h+='<div class="imp-items" id="iitems'+ci+'">';cat.items.forEach(function(item,j){h+='<div class="imp-item"><div class="imp-num" style="background:'+cat.bg+';color:'+cat.col+';border:1.5px solid '+cat.col+'44">'+(j+1)+'</div><div style="font-size:13px;font-weight:600;color:#0F1F4B;line-height:1.55">'+item+'</div></div>';});h+='</div></div>';});return h+'</div>';}
+window.togImp=function(i){var hd=document.getElementById('ichd'+i),it=document.getElementById('iitems'+i),chv=document.getElementById('ichv'+i);if(!it)return;var open=it.classList.contains('open');it.classList.toggle('open',!open);hd.classList.toggle('open',!open);if(chv)chv.style.transform=open?'rotate(0)':'rotate(180deg)';};
+
+function drawGeneral(){if(!DATA.length){document.getElementById('v-general').innerHTML='<div style="padding:60px;text-align:center;color:#5A6FA8;font-size:15px;font-weight:600;background:#fff;border-radius:18px;border:1.5px solid #CDDEFF">Pega tu CSV arriba y presiona <b style=\"color:#2563EB\">Procesar y actualizar</b> para ver el dashboard.</div>';return;}var hub=DATA.filter(function(r){return r.type==='HUB VISIT';}),del=DATA.filter(function(r){return r.type==='DELIVERIES';});var ags=buildAgents(DATA),sA=calcSt(DATA);var h=banner(DATA);h+='<div class="vert-row">'+vertCard(hub,'Hub Visit','#2563EB','#EBF2FF','#1A47C0')+vertCard(del,'Deliveries','#7C3AED','#EDE9FE','#5B21B6')+'</div>';h+=reasonsSplit(hub,del);h+='<div class="chart-row"><div class="chart-card"><div style="font-size:14px;font-weight:800;color:#0F1F4B;margin-bottom:8px">Tendencia CSAT diaria</div><div class="legend"><div class="legend-item"><span class="lsq" style="background:#2563EB"></span>CSAT %</div><div class="legend-item"><span class="lsq" style="background:#D97706"></span>Meta 80%</div><div class="legend-item"><span class="lsq" style="background:#16A34A"></span>Sobre meta</div><div class="legend-item"><span class="lsq" style="background:#DC2626"></span>Bajo meta</div></div><div style="position:relative;height:200px"><canvas id="c1"></canvas></div></div><div class="chart-card"><div style="font-size:14px;font-weight:800;color:#0F1F4B;margin-bottom:8px">Distribución de scores</div><div class="legend"><div class="legend-item"><span class="lsq" style="background:#DC2626"></span>1–2</div><div class="legend-item"><span class="lsq" style="background:#D97706"></span>3</div><div class="legend-item"><span class="lsq" style="background:#16A34A"></span>4–5</div></div><div style="position:relative;height:200px"><canvas id="c2"></canvas></div></div></div>';h+=SEC('Agentes · clic para ver comentarios');h+=agtTable(ags,sA.d);document.getElementById('v-general').innerHTML=h;setTimeout(function(){trendChart('c1',DATA);scoreChart('c2',DATA);},100);}
+function drawVertical(vid,type,label,ac,acLt,acDk){if(!DATA.length){document.getElementById(vid).innerHTML='';return;}var rows=DATA.filter(function(r){return r.type===type;}),ags=buildAgents(rows),s=calcSt(rows),reas=buildReasons(rows);var h='<div class="vert-row" style="grid-template-columns:1fr">'+vertCard(rows,label,ac,acLt,acDk)+'</div>';h+='<div class="chart-row"><div class="chart-card"><div style="font-size:14px;font-weight:800;color:#0F1F4B;margin-bottom:8px">Distribución de scores</div><div style="position:relative;height:190px"><canvas id="cv1_'+vid+'"></canvas></div></div><div class="chart-card"><div style="font-size:14px;font-weight:800;color:#0F1F4B;margin-bottom:8px">Promotores vs Detractores</div><div class="legend"><div class="legend-item"><span class="lsq" style="background:#16A34A"></span>Promotores '+s.p+'</div><div class="legend-item"><span class="lsq" style="background:#DC2626"></span>Detractores '+s.d+'</div></div><div style="position:relative;height:190px"><canvas id="cv2_'+vid+'"></canvas></div></div></div>';h+=SEC('Razones de detracción — '+label);h+='<div class="rsec" style="margin-bottom:18px"><div class="rsec-hd" style="background:'+acLt+'">'+FT(label+' · '+reas.length+' razones','12','800',acDk)+'</div>';var mD=reas.length?reas[0].d:1;reas.forEach(function(r,i){h+='<div class="ritem"><div style="font-size:13px;font-weight:800;color:#5A6FA8;width:20px;flex-shrink:0">'+(i+1)+'</div><div style="font-size:13px;font-weight:600;color:#0F1F4B;flex:1">'+r.r+'</div><div style="display:flex;align-items:center;gap:8px;flex-shrink:0"><div class="rbar-wrap"><div style="height:100%;width:'+Math.round(r.d/mD*80)+'%;background:'+ac+';border-radius:4px"></div></div><span class="pill" style="background:'+acLt+';color:'+acDk+';font-size:12px;font-weight:800">'+r.d+' det.</span></div></div>';});h+='</div>'+SEC('Agentes — '+label)+agtTable(ags,s.d);document.getElementById(vid).innerHTML=h;setTimeout(function(){scoreChart('cv1_'+vid,rows);donutChart('cv2_'+vid,s.p,s.d);},100);}
+function drawAgents(){if(!DATA.length){document.getElementById('v-agents').innerHTML='';return;}var ags=buildAgents(DATA),sA=calcSt(DATA);var h=top3Cards(ags)+bot3Cards(ags);h+=SEC('Ranking CSAT — todos los agentes');h+='<div style="display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap"><span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#2040A0"><span style="width:14px;height:5px;background:#DC2626;border-radius:2px;display:inline-block"></span>Bajo 50%</span><span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#2040A0"><span style="width:14px;height:5px;background:#D97706;border-radius:2px;display:inline-block"></span>50–79%</span><span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#2040A0"><span style="width:14px;height:5px;background:#16A34A;border-radius:2px;display:inline-block"></span>80%+ meta</span></div>';h+=agtVisual(ags,sA.d);h+=SEC('Tabla detalle');h+=agtTable(ags,sA.d);document.getElementById('v-agents').innerHTML=h;}
+function drawComments(){if(!DATA.length){document.getElementById('v-comments').innerHTML='';return;}var dets=DATA.filter(function(r){return r.cat==='Detractor'&&r.comment&&r.comment.length>5;}).sort(function(a,b){return a.score-b.score;});var pros=DATA.filter(function(r){return r.cat==='Promoter'&&r.comment&&r.comment.length>8;});var h=impPanel();h+=SEC('Detractores ('+dets.length+') — peor score primero','#DC2626');dets.forEach(function(r){h+='<div class="cmt-card det"><div style="display:flex;gap:7px;align-items:center;margin-bottom:7px;flex-wrap:wrap"><span class="pill" style="background:#FEE2E2;color:#991B1B;font-size:12px">Score '+r.score+'</span><span style="font-size:12px;font-weight:600;color:#5A6FA8">'+r.date+' · '+r.type+'</span>'+FT(agN(r.agent||''),'13','800','#0F1F4B')+'</div><div style="font-size:14px;font-weight:500;line-height:1.65;color:#0F1F4B;margin-bottom:5px;font-style:italic">"'+r.comment+'"</div><div style="font-size:12px;font-weight:700;color:#5A6FA8">'+r.reason+'</div></div>';});h+='<div style="height:1px;background:#CDDEFF;margin:16px 0"></div>';h+=SEC('Promotores ('+pros.length+')');pros.forEach(function(r){h+='<div class="cmt-card pro"><div style="display:flex;gap:7px;align-items:center;margin-bottom:7px;flex-wrap:wrap"><span class="pill" style="background:#DCFCE7;color:#166534;font-size:12px">Score '+r.score+'</span><span style="font-size:12px;font-weight:600;color:#5A6FA8">'+r.date+' · '+r.type+'</span>'+FT(agN(r.agent||''),'13','800','#0F1F4B')+'</div><div style="font-size:14px;font-weight:500;line-height:1.65;color:#0F1F4B;font-style:italic">"'+r.comment+'"</div></div>';});document.getElementById('v-comments').innerHTML=h;}
+function redraw(){if(CURTAB==='general')drawGeneral();else if(CURTAB==='hub')drawVertical('v-hub','HUB VISIT','Hub Visit','#2563EB','#EBF2FF','#1A47C0');else if(CURTAB==='del')drawVertical('v-del','DELIVERIES','Deliveries','#7C3AED','#EDE9FE','#5B21B6');else if(CURTAB==='agents')drawAgents();else if(CURTAB==='comments')drawComments();}
+function updatePills(){var hub=DATA.filter(function(r){return r.type==='HUB VISIT';}),del=DATA.filter(function(r){return r.type==='DELIVERIES';});var sH=calcSt(hub),sD=calcSt(del);document.getElementById('ph').textContent='Hub '+sH.csat+'%';document.getElementById('pd').textContent='Del '+sD.csat+'%';}
+window.nav=function(tab,btn){CURTAB=tab;document.querySelectorAll('.navbtn').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');document.querySelectorAll('.view').forEach(function(v){v.classList.remove('on');});document.getElementById('v-'+tab).classList.add('on');setTimeout(function(){redraw();},30);};
+
+(function initLoad(){
+  var stored=loadFromStorage();
+  if(stored&&stored.csv){
+    var result=doParse(stored.csv);
+    if(result&&result.parsed.length){
+      DATA=result.parsed;
+      var dates=DATA.map(function(r){return r.date;}).filter(function(d){return d!=='Sin fecha';}).sort();
+      if(dates.length)document.getElementById('ts').textContent='Rosario CDMX-Norte · '+dates[0].slice(5)+' → '+dates[dates.length-1].slice(5)+' · Meta: 80%';
+      updatePills();
+      document.getElementById('saved-info').style.display='inline-flex';
+      var savedDate=stored.saved?new Date(stored.saved).toLocaleString('es-MX'):'';
+      var msg=document.getElementById('msg');
+      msg.className='msg ok';
+      msg.textContent='💾 Datos cargados automáticamente · '+DATA.length+' encuestas · guardados el '+savedDate;
+      msg.style.display='block';
+      setTimeout(function(){redraw();},150);
+      return;
+    }
+  }
+  drawGeneral();
+})();
+</script>
+</body>
+</html>
